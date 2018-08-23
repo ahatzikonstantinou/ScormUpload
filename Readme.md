@@ -1,4 +1,8 @@
-#php
+# ScormUpload
+
+This is a library to facilitate the uploading of Scorm zip files to Goggle Cloud Storage.
+
+The library checks zip files using the ClamAV software and if the file is clean, it unzips and uploads the contents to the specified bucket.
 
 ## ClamAV
 
