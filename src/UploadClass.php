@@ -12,22 +12,12 @@ use RecursiveIteratorIterator;
 
 class UploadClass
 {
-    private $socket;
-
-    public function __construct( $socket = null )
-    {
-        $this->socket = $socket;
-
-        if( is_null( $socket ) )
-        {
-            $this->socket = $this->createSocket();
-        }
-    }
 
     /**
-     * Checks a single file for virus
+     * Checks a single file for virus.
      * 
      * @param string $file The fullpath of the file to check
+     * @param object $socket The socket to use for client communication to clam av
      * 
      * @return associative array $result {
      *  string ['filename']: the fullpath of the checked file,
@@ -35,10 +25,15 @@ class UploadClass
      *  string ['status']: 'FOUND' if virus found, 'OK' otherwise
      * }
      */
-    public function virusCheck( $file )
+    public function virusCheck( $file, $socket = null )
     {
+        if( is_null( $socket ) )
+        {
+            $socket = $this->createSocket();
+        }
+
         // Create a new instance of the Client
-        $quahog = new \Xenolope\Quahog\Client( $this->socket, 30, PHP_NORMAL_READ );
+        $quahog = new \Xenolope\Quahog\Client( $socket, 30, PHP_NORMAL_READ );
         
         // Scan a file
         $result = $quahog->scanFile( $file );
@@ -50,6 +45,7 @@ class UploadClass
      * Checks multiple files for virus
      * 
      * @param array of strings $files Array of the fullpath of the files to check
+     * @param object $socket The socket to use for client communication to clam av      
      * 
      * @return array of associative array $result {
      *  string ['filename']: the fullpath of the checked file,
@@ -57,12 +53,17 @@ class UploadClass
      *  string ['status']: 'FOUND' if virus found, 'OK' otherwise
      * }
      */
-    public function virusMultiCheck( $files )
+    public function virusMultiCheck( $files, $socket = null )
     {
         $results = array();
 
+        if( is_null( $socket ) )
+        {
+            $socket = $this->createSocket();
+        }
+
         // Create a new instance of the Client
-        $quahog = new \Xenolope\Quahog\Client( $this->socket, 30, PHP_NORMAL_READ );
+        $quahog = new \Xenolope\Quahog\Client( $socket, 30, PHP_NORMAL_READ );
         
         $quahog->startSession();
         
