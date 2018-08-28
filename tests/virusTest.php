@@ -44,6 +44,17 @@ class UploadClassTest extends TestCase
 
     public function testValidate()
     {
+        //test valid manifest
+        //
+        $zip = 'valid_manifest.zip';
+        $file = 'imsmanifest.xml';
+        $result = $this->validateFile( $zip, $file ) ;
+
+        // var_dump( $result );
+
+        $this->assertTrue( $result['valid'], 'valid_manifest.zip is valid' );
+
+
         //test no manifest
         //
         $zip = 'eicar_com.zip';
@@ -108,6 +119,17 @@ class UploadClassTest extends TestCase
         // var_dump( $result );
 
         $this->assertFalse( $result['valid'], 'no_launcher_manifest.zip is not valid' );
+
+
+        //test manifest wrong schema version
+        //
+        $zip = 'wrong_schemaversion_manifest.zip';
+        $file = 'imsmanifest.xml';
+        $result = $this->validateFile( $zip, $file ) ;
+
+        // var_dump( $result );
+
+        $this->assertFalse( $result['valid'], 'wrong_schemaversion_manifest.zip is not valid' );
     }
 
     private function validateFile( $zip, $file )

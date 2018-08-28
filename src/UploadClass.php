@@ -114,7 +114,7 @@ class UploadClass
         catch (Exception $e)
         {
             $this->removeZip( $destination );
-            return array( 'error' => 'imsmanifest.xml XML parse error', 'valid' => false );
+            return array( 'error' => 'imsmanifest.xml XML parse error. [' . $e->getMessage() . ']' , 'valid' => false );
         }
 
 
@@ -123,6 +123,9 @@ class UploadClass
             empty( $this->imsManifest->metadata->schemaversion ) ) {
                 $this->removeZip( $destination );
                 return array( 'error' => 'imsmanifest.xml has no version', 'valid' => false );
+        } elseif ( trim( $this->imsManifest->metadata->schemaversion ) !== trim( $_SERVER['SCHEMA_VERSION'] ) ) {
+            $this->removeZip( $destination );
+            return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );
         }
 
         if ( !isset($this->imsManifest->resources ) ) {

@@ -8,8 +8,14 @@ It also checks that the Scorm file is valid i.e.
   * An imsmanifest.xml exists
   * imsmanifest.xml is a valid xml file
   * imsmanifest.xml contains a schemaversion attribute in its metadata element
+  * the schema version is the one specified in the parameters
   * imsmanifest.xml contains a launcher i.e. a resource with an href attribute in its resources
  
+### Apache config file
+
+use mod_env to set
+
+  * `SetEnv SCHEMA_VERSION "xxxxxxxx"`
 
 ## ClamAV
 
