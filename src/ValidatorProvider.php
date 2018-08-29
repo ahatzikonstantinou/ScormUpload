@@ -32,6 +32,7 @@ class ValidatorProvider
         } elseif ( file_exists($destination . DIRECTORY_SEPARATOR . 'project.txt' ) ) {
             $validator = new CaptivateValidatorClass;
         } else {
+            $unzip->removeZip( $destination );
             throw new Exception( $file . ' does not contain imsmanifest.xml or project.txt in the root folder. No validator is applicable' );
         }
 
