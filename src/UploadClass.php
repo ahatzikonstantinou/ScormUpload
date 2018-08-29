@@ -5,13 +5,8 @@ namespace ahat\ScormUpload;
 require_once 'vendor/autoload.php';
 
 use ahat\ScormUpload\AntivirusClass;
-use ahat\ScormUpload\UnzipClass;
-use ahat\ScormUpload\ScormValidatorClass;
-use Socket\Raw\Socket;
+use ahat\ScormUpload\ValidatorProvider;
 use Exception;
-use ZipArchive;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 class UploadClass
 {
@@ -63,8 +58,15 @@ class UploadClass
      * }
      */
     public function validate( $file )
-    {        
-        $validator = new ScormValidatorClass;
+    {   
+        try
+        {     
+            $validator = ValidatorProvider::getValidator( $file ); // new ScormValidatorClass;
+        }
+        catch ( Exception $e )
+        {
+            return array( 'error' => 'Could not get a validator for ' . $file . ': ' . $e->getMessage() , 'valid' => false );
+        }
         return $validator->validate( $file );
     }
 

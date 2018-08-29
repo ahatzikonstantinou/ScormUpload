@@ -4,3 +4,5 @@ test.php
 test.txt
 .phpunit.result.cache
 tests/testfiles/imsmanifest.xml
+ScormUpload-ce5fab8b17db.json
+src/GCSClass.php

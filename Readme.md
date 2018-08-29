@@ -1,15 +1,18 @@
 # ScormUpload
 
-This is a library to facilitate the uploading of Scorm zip files to Goggle Cloud Storage.
+This is a library to facilitate the uploading of Scorm / Captivate zip files to Goggle Cloud Storage.
 
 The library checks zip files using the ClamAV software and if the file is clean, it unzips and uploads the contents to the specified bucket.
 
-It also checks that the Scorm file is valid i.e.
-  * An imsmanifest.xml exists
+It also checks that the Scorm / Captivate file is valid i.e.
+  * An imsmanifest.xml / project.txt exists
   * imsmanifest.xml is a valid xml file
+  * project.txt is a valid json file
   * imsmanifest.xml contains a schemaversion attribute in its metadata element
+  * project.txt contains a schemaVersion property in its metadata property
   * the schema version is the one specified in the parameters
-  * imsmanifest.xml contains a launcher i.e. a resource with an href attribute in its resources
+  * imsmanifest.xml contains a launcher i.e. a resource with an "href" attribute in its resources
+  * project.txt contains a launcher i.e. a non-empty metadata property "launchFile"
 
 ## Installation
 
@@ -40,7 +43,13 @@ to your php code to require all necessary packages.
 
 use mod_env to set
 
-  * `SetEnv SCHEMA_VERSION "xxxxxxxx"`
+  * `SetEnv SCHEMA_VERSION_SEPARATOR "x"`
+  * `SetEnv SCORM_SCHEMA_VERSION "xxxxxxxx"`
+  * `SetEnv SCORM_SCHEMA_VERSION_CASE_SENSITIVE "xxxxxxxx"`
+  * `SetEnv CAPTIVATE_SCHEMA_VERSION "xxxxxxxx"`
+  * `SetEnv CAPTIVATE_SCHEMA_VERSION_CASE_SENSITIVE "xxxxxxxx"`
+
+SCHEMA_VERSIONs are arrays of valid schema versions (i.e. strings) separated by the SCHEMA_VERSION_SEPARATOR e.g. '|'
 
 ## ClamAV
 

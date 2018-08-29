@@ -5,10 +5,12 @@ namespace ahat\ScormUpload;
 require_once 'vendor/autoload.php';
 
 use ahat\ScormUpload\UnzipClass;
+use ahat\ScormUpload\ValidatorInterface;
 use Exception;
 
-class ScormValidatorClass
+class ScormValidatorClass implements ValidatorInterface
 {
+    private $imsManifest = null;
 
     /**
      * Validates a Scorm package
@@ -20,7 +22,7 @@ class ScormValidatorClass
      * boolean ['valid']: true if valid, false otherwise
      * }
      */
-    public function validate( $file )
+    public function validate( $file, $removeOnInvalid = true )
     {        
         //first unzip the file
         $unzip = new UnzipClass;
@@ -48,23 +50,16 @@ class ScormValidatorClass
             return array( 'error' => 'imsmanifest.xml XML parse error. [' . $e->getMessage() . ']' , 'valid' => false );
         }
 
-
+        $validVersions = explode( $_SERVER['SCHEMA_VERSION_SEPARATOR'],  $_SERVER[ 'SCORM_SCHEMA_VERSION' ] );
         if ( !isset( $this->imsManifest->metadata ) ||
-            !isset( $this->imsManifest->metadata->schemaversion ) ||
-            empty( $this->imsManifest->metadata->schemaversion ) ) {
+            !isset( $this->imsManifest->metadata->schemaversion ) ) {
                 $unzip->removeZip( $destination );
-                return array( 'error' => 'imsmanifest.xml has no version', 'valid' => false );
+                return array( 'error' => 'imsmanifest.xml has no version metadata', 'valid' => false );
         } else {
-            if ( $_SERVER[ 'SCHEMA_VERSION_CASE_SENSITIVE' ] ) {
-                if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $_SERVER[ 'SCHEMA_VERSION' ], true ) ) {
-                    $unzip->removeZip( $destination );
-                    return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
-                }
-            } else {
-                if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $_SERVER[ 'SCHEMA_VERSION' ], false ) ) {
-                    $unzip->removeZip( $destination );
-                    return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
-                }
+            $caseSensitive = $_SERVER[ 'SCORM_SCHEMA_VERSION_CASE_SENSITIVE' ];
+            if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $validVersions, $caseSensitive ) ) {
+                $unzip->removeZip( $destination );
+                return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
             }
         }
 

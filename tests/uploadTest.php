@@ -33,97 +33,71 @@ class UploadClassTest extends TestCase
 
     public function testValidate()
     {
-        //test valid manifest
-        //
-        $zip = 'valid_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'valid_manifest.zip', true ) ;
         // var_dump( $result );
-
-        $this->assertTrue( $result['valid'], 'valid_manifest.zip is valid' );
 
 
         //test no manifest
-        //
-        $zip = 'eicar_com.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'eicar_com.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'eicar_com.zip is not valid' );
-
-
-        //test empty manifest
-        //
-        $zip = 'empty_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        
+        $result = $this->validateFile( 'empty_manifest.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'empty_manifest.zip is not valid' );
 
+        $result = $this->validateFile( 'invalid_xml_manifest.zip' ) ;
+        // var_dump( $result );
+        
+        
+        $result = $this->validateFile( 'no_version_manifest.zip' ) ;
+        // var_dump( $result );
+        
 
-        //test invalid xml manifest
-        //
-        $zip = 'invalid_xml_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'no_resources_manifest.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'invalid_xml_manifest.zip is not valid' );
 
-
-        //test manifest no version
-        //
-        $zip = 'no_version_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'no_launcher_manifest.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'no_version_manifest.zip is not valid' );
 
-
-        //test manifest no resources
-        //
-        $zip = 'no_resources_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'wrong_schemaversion_manifest.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'no_resources_manifest.zip is not valid' );
 
-
-        //test manifest no launcher
-        //
-        $zip = 'no_launcher_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        //test valid captivate package
+        $result = $this->validateFile( 'CodexData_test_LearnWorlds.zip', true ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'no_launcher_manifest.zip is not valid' );
 
-
-        //test manifest wrong schema version
-        //
-        $zip = 'wrong_schemaversion_manifest.zip';
-        $file = 'imsmanifest.xml';
-        $result = $this->validateFile( $zip, $file ) ;
-
+        $result = $this->validateFile( 'no_schemaVersion_property_project.zip' ) ;
         // var_dump( $result );
 
-        $this->assertFalse( $result['valid'], 'wrong_schemaversion_manifest.zip is not valid' );
+
+        $result = $this->validateFile( 'wrong_schemaVersion_project.zip' ) ;
+        // var_dump( $result );
+
+        
+        $result = $this->validateFile( 'no_launchFile_property_project.zip' ) ;
+        // var_dump( $result );
+
+
+        $result = $this->validateFile( 'empty_launchFile_project.zip' );
+        // var_dump( $result );
     }
 
-    private function validateFile( $zip, $file )
+    private function validateFile( $zip, $assertTrue = false )
     {
         $upload = new UploadClass;
-        return $upload->validate( './tests/testfiles/' . $zip );
+        $result = $upload->validate( './tests/testfiles/' . $zip );
+
+        if( $assertTrue ) {
+            $this->assertTrue( $result['valid'], $zip . ' is valid' );
+        } else {
+            $this->assertFalse( $result['valid'], $zip . ' is not valid' );
+        }
+
+        return $result;
     }
 }
