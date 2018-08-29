@@ -31,17 +31,6 @@ class UploadClassTest extends TestCase
         $this->assertEquals( 'OK', $results[2]['status'] );
     }
 
-    public function testUnzipRemove()
-    {
-        $file = './tests/testfiles/eicar_com.zip';
-        $destination = UploadClass::getTempUnzipDir() . DIRECTORY_SEPARATOR . basename( $file );
-        $upload = new UploadClass;
-        $upload->unzip( $file, $destination );
-        $this->assertDirectoryExists( $destination, $file . ' unzipped correctly to '. $destination );
-        $upload->removeZip( $destination );
-        $this->assertDirectoryNotExists( $destination, $destination . ' removed correctly' );
-    }
-
     public function testValidate()
     {
         //test valid manifest

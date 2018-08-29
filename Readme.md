@@ -10,7 +10,32 @@ It also checks that the Scorm file is valid i.e.
   * imsmanifest.xml contains a schemaversion attribute in its metadata element
   * the schema version is the one specified in the parameters
   * imsmanifest.xml contains a launcher i.e. a resource with an href attribute in its resources
- 
+
+## Installation
+
+Download the code to a folder inside your project and run 
+
+```
+composer install
+```
+to install all dependencies
+
+or
+
+```
+composer install --no-dev
+```
+
+to omit development dependencies such as unit tests.
+
+## Usage
+Add
+
+```php
+require_once 'vendor/autoload.php'
+```
+to your php code to require all necessary packages.
+
 ### Apache config file
 
 use mod_env to set
