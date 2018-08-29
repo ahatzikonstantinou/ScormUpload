@@ -6,8 +6,6 @@ require_once 'vendor/autoload.php';
 
 use ahat\ScormUpload\UnzipClass;
 use Exception;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 
 class ScormValidatorClass
 {
@@ -56,9 +54,18 @@ class ScormValidatorClass
             empty( $this->imsManifest->metadata->schemaversion ) ) {
                 $unzip->removeZip( $destination );
                 return array( 'error' => 'imsmanifest.xml has no version', 'valid' => false );
-        } elseif ( trim( $this->imsManifest->metadata->schemaversion ) !== trim( $_SERVER['SCHEMA_VERSION'] ) ) {
-            $unzip->removeZip( $destination );
-            return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );
+        } else {
+            if ( $_SERVER[ 'SCHEMA_VERSION_CASE_SENSITIVE' ] ) {
+                if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $_SERVER[ 'SCHEMA_VERSION' ], true ) ) {
+                    $unzip->removeZip( $destination );
+                    return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
+                }
+            } else {
+                if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $_SERVER[ 'SCHEMA_VERSION' ], false ) ) {
+                    $unzip->removeZip( $destination );
+                    return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
+                }
+            }
         }
 
         if ( !isset($this->imsManifest->resources ) ) {
