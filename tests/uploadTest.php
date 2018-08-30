@@ -3,6 +3,8 @@ namespace ahat\ScormUpload\Tests;
 
 use PHPUnit\Framework\TestCase;
 use ahat\ScormUpload\UploadClass;
+use ahat\ScormUpload\GCSClass;
+use Exception;
 
 class UploadClassTest extends TestCase
 {
@@ -14,7 +16,7 @@ class UploadClassTest extends TestCase
     public function testVirusCheck()
     {
         $upload = new UploadClass;
-        $result = $upload->virusCheck( '/tmp/eicar_com.zip' );
+        $result = $upload->virusCheck( 'eicar_com.zip' );
         // var_dump( $result );
         $this->assertEquals( 'FOUND', $result['status'] );
     }
@@ -22,7 +24,7 @@ class UploadClassTest extends TestCase
     public function testVirusMultiCheck()
     {
         $upload = new UploadClass;
-        $results = $upload->virusMultiCheck( ['/tmp/eicar_com.zip','/tmp/clean_file.com', '/tmp/corrupt_file.zip'] );
+        $results = $upload->virusMultiCheck( ['eicar_com.zip','clean_file.com', 'corrupt_file.zip'] );
 
         // var_dump( $results );
 
@@ -35,7 +37,6 @@ class UploadClassTest extends TestCase
     {
         $result = $this->validateFile( 'valid_manifest.zip', true ) ;
         // var_dump( $result );
-
 
         //test no manifest
         $result = $this->validateFile( 'eicar_com.zip' ) ;
@@ -85,6 +86,16 @@ class UploadClassTest extends TestCase
 
         $result = $this->validateFile( 'empty_launchFile_project.zip' );
         // var_dump( $result );
+
+        //IFRS-for-SMEs-e-learning-module.zip does not contain imsmanifest.xml or project.txt
+        $result = $this->validateFile( 'IFRS-for-SMEs-e-learning-module.zip' );
+        // var_dump( $result );
+
+        $result = $this->validateFile( 'Airport Known Supplier - Storyline output.zip', true );
+        // var_dump( $result );
+
+        $result = $this->validateFile( 'A-CMP300 Ver9.zip', true );
+        
     }
 
     private function validateFile( $zip, $assertTrue = false )
@@ -92,12 +103,59 @@ class UploadClassTest extends TestCase
         $upload = new UploadClass;
         $result = $upload->validate( './tests/testfiles/' . $zip, true, true );
 
+        // var_dump( $result );
+
         if( $assertTrue ) {
-            $this->assertTrue( $result['valid'], $zip . ' is valid' );
+            $this->assertTrue( $result['valid'], $zip . ' is not valid' );
         } else {
-            $this->assertFalse( $result['valid'], $zip . ' is not valid' );
+            $this->assertFalse( $result['valid'], $zip . ' is valid' );
         }
 
         return $result;
+    }
+
+    public function testUpload()
+    {        
+        $upload = new UploadClass;
+
+        $zip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $zip );
+        // var_dump( $result );
+        $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
+        
+        $zip = './tests/testfiles/IFRS-for-SMEs-e-learning-module.zip';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $zip );
+        // var_dump( $result );
+        $this->assertFailed( $result['success'], $zip . ' upload failed because ' . $zip . ' is not a recognizablke package.'  );
+
+
+    }
+
+    public function testReplace()
+    {   
+        $folderId = 'test3';
+        $old = 'CodexData_test_LearnWorlds';
+        $oldZip = './tests/testfiles/' . $old . '.zip';
+        $new = './tests/testfiles/Airport Known Supplier - Storyline output.zip';
+
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+
+        //ensure we start clean
+        $deleted = $gcs->removePackage( $folderId, $old );
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $old ) );
+        $this->assertTrue( $remaining == 0, 'Removal of ' . $old . ' failed. ' . $remaining . ' files remaining.' );
+
+        //upload the old package
+        $upload = new UploadClass;
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ),  $folderId, $oldZip );
+        $this->assertTrue( $result['success'], $oldZip . ' upload failed.'  );
+        
+        //replace with new
+        $result = $upload->replacePackage( 'test3', $old, $new );
+        // var_dump( $result );
+        $this->assertTrue( $result['success'], 'Replacement with ' . $new . ' failed. ' . $result['uploaded'] . ' were uploaded' );
+
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $old ) );
+        $this->assertTrue( $remaining == 0, 'Replacement of ' . $old . ' failed. ' . $remaining . ' old files remaining.' );
     }
 }

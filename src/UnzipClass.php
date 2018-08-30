@@ -19,6 +19,7 @@ class UnzipClass
      */
     public function removeZip( $dir )
     {
+        // echo "Removing $dir\n";
         $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
         $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
         foreach($files as $file) {
@@ -62,7 +63,7 @@ class UnzipClass
         }
 
         if ( is_null( $destination ) ) {
-            $destination = UnzipClass::getTempUnzipDir() . DIRECTORY_SEPARATOR . basename( $file );
+            $destination = UnzipClass::getTempUnzipDir() . DIRECTORY_SEPARATOR . pathinfo( $file, PATHINFO_FILENAME );
         }
 
         if (!$zip->extractTo($destination)) {
@@ -94,7 +95,7 @@ class UnzipClass
      */
     public static function getTempUnzipDir()
     {
-        $destinationDir = '/tmp';
+        $destinationDir = '.';
         if (isset($_SERVER['TMP_UNZIP_DIR']) && !empty($_SERVER['TMP_UNZIP_DIR'])) {
             $destinationDir = $_SERVER['TMP_UNZIP_DIR'];
         }

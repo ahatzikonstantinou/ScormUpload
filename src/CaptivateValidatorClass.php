@@ -18,6 +18,9 @@ class CaptivateValidatorClass implements ValidatorInterface
      * @param string $file
      * 
      * @return array $result {
+     * string ['destination']: the destination folder where the package file was extracted, NULL if it was removed
+     * string ['version']: the version of the package as described by metadata schemaVersion, NULL if not found
+     * string ['launcher']: the launcher file of the package, NULL if not found
      * string ['error']: text descripton of the error, NULL if no error
      * boolean ['valid']: true if valid, false otherwise
      * }
@@ -34,8 +37,9 @@ class CaptivateValidatorClass implements ValidatorInterface
         if ( !file_exists($destination . DIRECTORY_SEPARATOR . $projectTxt ) ) {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => 'No ' . $projectTxt . ' found', 'valid' => false );
+            return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => 'No ' . $projectTxt . ' found', 'valid' => false );
         }
         
         //project is valid json
@@ -47,16 +51,18 @@ class CaptivateValidatorClass implements ValidatorInterface
             if ( !$this->project ) {
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => $projectTxt . ' json parse error', 'valid' => false );
+                return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => $projectTxt . ' json parse error', 'valid' => false );
             }
         }
         catch (Exception $e)
         {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => $projectTxt . ' json parse error. [' . $e->getMessage() . ']' , 'valid' => false );
+            return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => $projectTxt . ' json parse error. [' . $e->getMessage() . ']' , 'valid' => false );
         }
 
         $validVersions = explode( $_SERVER['SCHEMA_VERSION_SEPARATOR'],  $_SERVER[ 'CAPTIVATE_SCHEMA_VERSION' ] );
@@ -64,30 +70,34 @@ class CaptivateValidatorClass implements ValidatorInterface
             !isset( $this->project['metadata']['schemaVersion'] ) ) {
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => $projectTxt . ' has no version metadata', 'valid' => false );
+                return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => $projectTxt . ' has no version metadata', 'valid' => false );
         } else {
             $caseSensitive = $_SERVER[ 'CAPTIVATE_SCHEMA_VERSION_CASE_SENSITIVE' ];
             if( !in_array( trim( $this->project['metadata']['schemaVersion'] ), $validVersions, $caseSensitive ) ) {
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => $projectTxt . ' has wrong schema version', 'valid' => false );    
+                return array( 'destination' => $destination, 'version' => trim( $this->project['metadata']['schemaVersion'] ), 'launcher' => null, 'error' => $projectTxt . ' has wrong schema version', 'valid' => false );    
             }
         }
 
         if ( !isset( $this->project['metadata']['launchFile'] ) || empty( $this->project['metadata']['launchFile'] ) ) {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => $projectTxt . ' has no launcher', 'valid' => false );
+            return array( 'destination' => $destination, 'version' => trim( $this->project['metadata']['schemaVersion'] ), 'launcher' => null, 'error' => $projectTxt . ' has no launcher', 'valid' => false );
         }         
 
         if( $removeOnValid ) {
             $unzip->removeZip( $destination );
+            $destination = null;
         }
 
-        return array( 'error' => null, 'valid' => true );
+        return array( 'destination' => $destination, 'version' => trim( $this->project['metadata']['schemaVersion'] ), 'launcher' => $this->project['metadata']['launchFile'], 'error' => null, 'valid' => true );
     }
 
 }

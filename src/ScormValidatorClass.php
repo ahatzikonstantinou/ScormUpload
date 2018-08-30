@@ -18,6 +18,9 @@ class ScormValidatorClass implements ValidatorInterface
      * @param string $file
      * 
      * @return array $result {
+     * string ['destination']: the destination folder where the package file was extracted, NULL if it was removed
+     * string ['version']: the version of the package as described by metadata schemaVersion
+     * string ['launcher']: the launcher file of the package
      * string ['error']: text descripton of the error, NULL if no error
      * boolean ['valid']: true if valid, false otherwise
      * }
@@ -33,8 +36,9 @@ class ScormValidatorClass implements ValidatorInterface
         if(!file_exists($destination.'/imsmanifest.xml')){
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => 'No imsmanifest.xml found', 'valid' => false );
+            return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => 'No imsmanifest.xml found', 'valid' => false );
         }
         
         //imsmanifest is valid xml
@@ -44,16 +48,18 @@ class ScormValidatorClass implements ValidatorInterface
             if(!$this->imsManifest){
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => 'imsmanifest.xml XML parse error', 'valid' => false );
+                return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => 'imsmanifest.xml XML parse error', 'valid' => false );
             }
         }
         catch (Exception $e)
         {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => 'imsmanifest.xml XML parse error. [' . $e->getMessage() . ']' , 'valid' => false );
+            return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => 'imsmanifest.xml XML parse error. [' . $e->getMessage() . ']' , 'valid' => false );
         }
 
         $validVersions = explode( $_SERVER['SCHEMA_VERSION_SEPARATOR'],  $_SERVER[ 'SCORM_SCHEMA_VERSION' ] );
@@ -61,23 +67,26 @@ class ScormValidatorClass implements ValidatorInterface
             !isset( $this->imsManifest->metadata->schemaversion ) ) {
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => 'imsmanifest.xml has no version metadata', 'valid' => false );
+                return array( 'destination' => $destination, 'version' => null, 'launcher' => null, 'error' => 'imsmanifest.xml has no version metadata', 'valid' => false );
         } else {
             $caseSensitive = $_SERVER[ 'SCORM_SCHEMA_VERSION_CASE_SENSITIVE' ];
             if( !in_array( trim( $this->imsManifest->metadata->schemaversion ), $validVersions, $caseSensitive ) ) {
                 if( $removeOnInvalid ) {
                     $unzip->removeZip( $destination );
+                    $destination = null;
                 }
-                return array( 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
+                return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => null, 'error' => 'imsmanifest.xml has wrong schema version', 'valid' => false );    
             }
         }
 
         if ( !isset($this->imsManifest->resources ) ) {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => 'imsmanifest.xml has no resources', 'valid' => false );
+            return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => null, 'error' => 'imsmanifest.xml has no resources', 'valid' => false );
         }
         
         if ( !isset( $this->imsManifest->resources->resource ) ||
@@ -85,15 +94,17 @@ class ScormValidatorClass implements ValidatorInterface
         ) {
             if( $removeOnInvalid ) {
                 $unzip->removeZip( $destination );
+                $destination = null;
             }
-            return array( 'error' => 'imsmanifest.xml has no launcher', 'valid' => false );
+            return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => null, 'error' => 'imsmanifest.xml has no launcher', 'valid' => false );
         }         
 
         if( $removeOnValid ) {
             $unzip->removeZip( $destination );
+            $destination = null;
         }
         
-        return array( 'error' => null, 'valid' => true );
+        return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => $this->imsManifest->resources->resource->attributes()->href, 'error' => null, 'valid' => true );
     }
 
 }

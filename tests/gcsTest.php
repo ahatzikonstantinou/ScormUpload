@@ -14,18 +14,9 @@ class UploadClassTest extends TestCase
         $this->stack = [];
     }
 
-    public function testListBucket()
-    {
-        $gcs = new GCSClass( 'learnworlds_packages' );
-
-        $gcs->listBucket();
-
-        $this->assertTrue( true );
-    }
-
     public function testUpload()
     {
-        $gcs = new GCSClass( 'learnworlds_packages' );
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
 
         $packagePath = './tests/testfiles/CodexData_test_LearnWorlds';
         $folderId = 'test1';
@@ -35,26 +26,37 @@ class UploadClassTest extends TestCase
         foreach($objects as $object){
             $count ++;
         }
-        echo "Uploaded $uploaded objects\n";
+        // echo "Uploaded $uploaded objects\n";
         $this->assertTrue( $count == $uploaded, "Upload of package " . $packagePath . ' in GCS folder ' . $folderId . ' failed. Uploaded ' . $uploaded . ' of ' . $count . ' files.'  );
     }
 
     public function testRemovePackage()
     {
-        $gcs = new GCSClass( 'learnworlds_packages' );
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $package = 'CodexData_test_LearnWorlds';
         $folderId = 'test1';
         $deleted = $gcs->removePackage( $folderId, $package );
-        echo "Deleted $deleted objects\n";
+        // echo "Deleted $deleted objects\n";
 
         $remaining = count( $gcs->listFolder( $folderId . '/' . $package ) );
 
         $this->assertTrue( $remaining == 0, 'Removal of ' . $package . ' failed. ' . $remaining . ' files remaining.' );
     }
 
+    /* The following tests are used for inspection only and do not contain any proper assertions
+
+    public function testListBucket()
+    {
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+
+        $gcs->listBucket();
+
+        $this->assertTrue( true );
+    }
+
     public function testListPackages()
     {
-        $gcs = new GCSClass( 'learnworlds_packages' );
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $folderId = 'test1';
 
         $gcs->listPackages( $folderId );
@@ -64,8 +66,9 @@ class UploadClassTest extends TestCase
 
     public function testListFolders()
     {
-        $gcs = new GCSClass( 'learnworlds_packages' );
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $gcs->listFolders();
         $this->assertTrue( true );
     }
+    */
 }

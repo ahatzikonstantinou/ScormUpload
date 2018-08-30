@@ -18,9 +18,9 @@ class UnzipClassTest extends TestCase
         $destination = UnzipClass::getTempUnzipDir() . DIRECTORY_SEPARATOR . basename( $file );
         $unzip = new UnzipClass;
         $unzip->unzip( $file, $destination );
-        $this->assertDirectoryExists( $destination, $file . ' unzipped correctly to '. $destination );
+        $this->assertDirectoryExists( $destination, $file . ' unzip to '. $destination . ' failed.' );
         $unzip->removeZip( $destination );
-        $this->assertDirectoryNotExists( $destination, $destination . ' removed correctly' );
+        $this->assertDirectoryNotExists( $destination, $destination . ' removal failed.' );
     }
 
 }

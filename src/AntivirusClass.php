@@ -33,6 +33,9 @@ class AntivirusClass
         $quahog = new \Xenolope\Quahog\Client( $socket, 30, PHP_NORMAL_READ );
         
         // Scan a file
+        if( isset( $_SERVER[ 'CLAM_BINDMOUNT_VOLUME' ] ) ) {
+            $file = $_SERVER[ 'CLAM_BINDMOUNT_VOLUME' ] . DIRECTORY_SEPARATOR . basename( $file );
+        }
         $result = $quahog->scanFile( $file );
 
         return $result;
@@ -65,6 +68,10 @@ class AntivirusClass
         $quahog->startSession();
         
         foreach ($files as &$file) {
+            if( isset( $_SERVER[ 'CLAM_BINDMOUNT_VOLUME' ] ) ) {
+                $file = $_SERVER[ 'CLAM_BINDMOUNT_VOLUME' ] . DIRECTORY_SEPARATOR . basename( $file );
+            }
+    
             $result = $quahog->scanFile( $file );
 
             $results[] = $result;

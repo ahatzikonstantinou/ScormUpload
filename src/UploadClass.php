@@ -6,6 +6,8 @@ require_once 'vendor/autoload.php';
 
 use ahat\ScormUpload\AntivirusClass;
 use ahat\ScormUpload\ValidatorProvider;
+use ahat\ScormUpload\GCSClass;
+use ahat\ScormUpload\UnzipClass;
 use Exception;
 
 class UploadClass implements ValidatorInterface
@@ -71,15 +73,101 @@ class UploadClass implements ValidatorInterface
     }
 
     /**
-     * Unzips a zip file, and uploads the contents to Google Storage Cloud
+     * Unzips a zip file, and uploads the contents to Google Storage Cloud. In case of validation
+     * error the unzipped folder is removed.
      * 
      * @param string $bucketName the name of your Google Cloud bucket.
+     * @param string $folderId the GCS folder where to upload the file.
      * @param string $file the full path to the file to upload.
      * 
-     */
-    public function uploadZip( $bucketName, $file )
+     * @return associative array $result {
+     *  string ['filename']: the fullpath of the checked file,
+     *  object ['virusCheck']: the ruselt returned by the virusCheck function
+     *  object ['validation']: the result returned by the validation function
+     *  integer ['uploaded']: count of uploaded files
+     *  boolean ['success']: true if everything went ok, false otherwise
+    */
+    public function uploadZip( $bucketName, $folderId, $file )
     {
+        $result = array( 'filename' => $file, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
 
+        $result['virusCheck'] = $this->virusCheck( $file );
+        // var_dump( $result['virusCheck'] );
+        if ( $result['virusCheck']['status'] === 'FOUND' ) {            
+            return $result ;
+        }
+
+        $result['validation'] = $this->validate( $file );
+        // var_dump( $result['validation'] );
+        if( !$result['validation']['valid'] ) {
+            return $result;
+        }
+
+        //NOTE: the unzip folder is returned in the validation result
+        $unzippedPackage = $result['validation']['destination'];
+
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $result['uploaded'] = $gcs->uploadPackage( $folderId, $unzippedPackage );
+        $result['success'] = true;
+        // var_dump( $result );
+
+        //cleanup the remaining unzip folder
+        $unzip = new UnzipClass;
+        $unzip->removeZip( $unzippedPackage );
+
+        return $result;
+    }
+
+    /**
+     * Replaces an existing package with a new one, provided the new package passes virus and validation checks.
+     * In case of validation error the unzipped folder is removed.
+     * 
+     * @param string $bucketName the name of your Google Cloud bucket.
+     * @param string $folderId the GCS folder where to upload the file.
+     * @param string $file the full path to the file to upload.
+     * 
+     * @return associative array $result {
+     *  string ['folderId']: the GCS folder where the old package is,
+     *  string ['old']: the name of the old package to replace,
+     *  string ['new']: the local fullpath of the new package file,
+     *  object ['virusCheck']: the ruselt returned by the virusCheck function
+     *  object ['validation']: the result returned by the validation function
+     *  integer ['uploaded']: count of uploaded files
+     *  boolean ['success']: true if everything went ok, false otherwise
+    */
+    public function replacePackage( $folderId, $oldPackage, $newPackage )
+    {
+        $result = array( 'folderId' => $folderId, 'old' => $oldPackage, 'new' => $newPackage, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
+
+        $result['virusCheck'] = $this->virusCheck( $newPackage );
+        // var_dump( $result['virusCheck'] );
+        if ( $result['virusCheck']['status'] === 'FOUND' ) {            
+            return $result ;
+        }
+
+        $result['validation'] = $this->validate( $newPackage );
+        // var_dump( $result['validation'] );
+        if( !$result['validation']['valid'] ) {
+            return $result;
+        }
+
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $deleted = $gcs->removePackage( $folderId, $oldPackage );
+
+        //NOTE: the unzip folder is returned in the validation result
+        $unzippedPackage = $result['validation']['destination'];
+
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $result['uploaded'] = $gcs->uploadPackage( $folderId, $unzippedPackage );
+        $result['success'] = true;
+        // var_dump( $result );
+
+        //cleanup the remaining unzip folder
+        $unzip = new UnzipClass;
+        $unzip->removeZip( $unzippedPackage );
+
+        return $result;
+        
     }
 
 }
