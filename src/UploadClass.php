@@ -8,7 +8,7 @@ use ahat\ScormUpload\AntivirusClass;
 use ahat\ScormUpload\ValidatorProvider;
 use Exception;
 
-class UploadClass
+class UploadClass implements ValidatorInterface
 {
 
     /**
@@ -57,7 +57,7 @@ class UploadClass
      * boolean ['valid']: true if valid, false otherwise
      * }
      */
-    public function validate( $file )
+    public function validate( $file, $removeOnValid = false, $removeOnInvalid = true )
     {   
         try
         {     
@@ -67,7 +67,7 @@ class UploadClass
         {
             return array( 'error' => 'Could not get a validator for ' . $file . ': ' . $e->getMessage() , 'valid' => false );
         }
-        return $validator->validate( $file );
+        return $validator->validate( $file, $removeOnValid, $removeOnInvalid );
     }
 
     /**

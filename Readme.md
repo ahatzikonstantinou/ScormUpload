@@ -51,6 +51,43 @@ use mod_env to set
 
 SCHEMA_VERSIONs are arrays of valid schema versions (i.e. strings) separated by the SCHEMA_VERSION_SEPARATOR e.g. '|'
 
+### Environment variables
+
+Per Google Cloud Storage [instructions](https://cloud.google.com/storage/docs/reference/libraries#client-libraries-install-php), once a service account is created and the file containing the corresponding key is downloaded, environment variable GOOGLE_APPLICATION_CREDENTIALS must be exported. Also, export the GOOGLE_CLOUD_STORAGE_PROJECT_ID as an environment variable.
+ 
+#### Linux or MacOS
+```
+export GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
+export GOOGLE_CLOUD_STORAGE_PROJECT_ID="xxxxxxxx"
+```
+for example
+```
+export GOOGLE_APPLICATION_CREDENTIALS="/home/user/Downloads/[FILE_NAME].json"
+export GOOGLE_CLOUD_STORAGE_PROJECT_ID="840375620846"
+```
+
+#### Windows
+
+##### PowerShell
+```
+$env:GOOGLE_APPLICATION_CREDENTIALS="[PATH]"
+$env:GOOGLE_CLOUD_STORAGE_PROJECT_ID="xxxxxxxx"
+```
+For example:
+```
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\username\Downloads\[FILE_NAME].json"
+$env:GOOGLE_CLOUD_STORAGE_PROJECT_ID="840375620846"
+```
+##### command prompt:
+```
+set GOOGLE_APPLICATION_CREDENTIALS=[PATH]
+set GOOGLE_CLOUD_STORAGE_PROJECT_ID=xxxxxxxx
+```
+**Important Note** 
+
+When setting environment variables in code, e.g. in unit test, **do not** use the `$_ENV` variable. Values will not be passed in the code. Instead use function `putenv(...)`. For an example see file `tests/bootstrap.php`
+
+
 ## ClamAV
 
 ### Apache config file

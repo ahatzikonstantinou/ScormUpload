@@ -90,7 +90,7 @@ class UploadClassTest extends TestCase
     private function validateFile( $zip, $assertTrue = false )
     {
         $upload = new UploadClass;
-        $result = $upload->validate( './tests/testfiles/' . $zip );
+        $result = $upload->validate( './tests/testfiles/' . $zip, true, true );
 
         if( $assertTrue ) {
             $this->assertTrue( $result['valid'], $zip . ' is valid' );

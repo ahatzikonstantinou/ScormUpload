@@ -7,5 +7,8 @@ $_SERVER[ 'SCORM_SCHEMA_VERSION' ] = 'CAM 1.3';
 $_SERVER[ 'SCORM_SCHEMA_VERSION_CASE_SENSITIVE' ] = false;
 $_SERVER[ 'CAPTIVATE_SCHEMA_VERSION' ] = 'CAM 1.3|';
 $_SERVER[ 'CAPTIVATE_SCHEMA_VERSION_CASE_SENSITIVE' ] = false;
-$_SERVER[ 'GOOGLE_CLOUD_STORAGE_PROJECT_ID'] = '';
-$_ENV[ 'GOOGLE_APPLICATION_CREDENTIALS' ] = '/home/antonis/Projects/learnworlds/ScormUpload/ScormUpload-ce5fab8b17db.json';
+
+// CAUTION: Do NOT use $_ENV for the following variables or else authentication to google cloud storage will fail
+putenv( 'GOOGLE_CLOUD_STORAGE_PROJECT_ID=819215810916' );
+putenv( 'GOOGLE_APPLICATION_CREDENTIALS=/home/antonis/Projects/learnworlds/ScormUpload/Scorm-9d50eec8f95f.json' );
+
