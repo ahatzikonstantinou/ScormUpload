@@ -36,8 +36,49 @@ Add
 
 ```php
 require_once 'vendor/autoload.php'
+
+use ahat\ScormUpload\UploadClass;
 ```
 to your php code to require all necessary packages.
+
+#### Upload package
+```php
+$upload = new UploadClass;
+$result = $upload->uploadZip( 'GCS_bucket_name', 'folder id', 'package zip file' );
+```
+
+#### Replace package
+```php
+$upload = new UploadClass;
+$result = $upload->replacePackage( 'GCS_bucket_name', 'folder id', 'old package name', '/path/to/new/package.zip' );
+```
+
+#### Remove package
+```php
+$upload = new UploadClass;
+$result = $upload->removePackage( 'GCS_bucket_name', 'folder id', 'package name' );
+```
+
+#### Virus check a single file
+```php
+$upload = new UploadClass;
+$result = $upload->virusCheck( 'filename.ext' );
+```
+
+#### Virus check mutliple files
+```php
+$upload = new UploadClass;
+$result = $upload->virusCheck( 'filename1.ext', 'filename2.ext', 'filename3.ext' );
+```
+
+#### Validate package
+```php
+$upload = new UploadClass;
+$result = $upload->validate( '/path/to/package.zip' );
+```
+
+#### Additional utilities
+See unit tests `tests/gcsTest.php` and `tests/unzipTest.php` for usage of additional utilities.
 
 ### Apache config file
 

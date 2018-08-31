@@ -135,7 +135,7 @@ class UploadClass implements ValidatorInterface
      *  integer ['uploaded']: count of uploaded files
      *  boolean ['success']: true if everything went ok, false otherwise
     */
-    public function replacePackage( $folderId, $oldPackage, $newPackage )
+    public function replacePackage( $bucketName, $folderId, $oldPackage, $newPackage )
     {
         $result = array( 'folderId' => $folderId, 'old' => $oldPackage, 'new' => $newPackage, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
 
@@ -151,13 +151,12 @@ class UploadClass implements ValidatorInterface
             return $result;
         }
 
-        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $gcs = new GCSClass( $bucketName );
         $deleted = $gcs->removePackage( $folderId, $oldPackage );
 
         //NOTE: the unzip folder is returned in the validation result
         $unzippedPackage = $result['validation']['destination'];
 
-        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $result['uploaded'] = $gcs->uploadPackage( $folderId, $unzippedPackage );
         $result['success'] = true;
         // var_dump( $result );
@@ -178,9 +177,9 @@ class UploadClass implements ValidatorInterface
      * 
      * @return integer The number of deleted files
      */
-    public function removePackage( $folderId, $packageName )
+    public function removePackage( $bucketName, $folderId, $packageName )
     {
-        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $gcs = new GCSClass( $bucketName );
         return $gcs->removePackage( $folderId, $packageName );
     }
 

@@ -126,7 +126,7 @@ class UploadClassTest extends TestCase
         $zip = './tests/testfiles/IFRS-for-SMEs-e-learning-module.zip';
         $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $zip );
         // var_dump( $result );
-        $this->assertFailed( $result['success'], $zip . ' upload failed because ' . $zip . ' is not a recognizablke package.'  );
+        $this->assertFalse( $result['success'], $zip . ' upload failed because ' . $zip . ' is not a recognizablke package.'  );
 
 
     }
@@ -151,7 +151,7 @@ class UploadClassTest extends TestCase
         $this->assertTrue( $result['success'], $oldZip . ' upload failed.'  );
         
         //replace with new
-        $result = $upload->replacePackage( 'test3', $old, $new );
+        $result = $upload->replacePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $old, $new );
         // var_dump( $result );
         $this->assertTrue( $result['success'], 'Replacement with ' . $new . ' failed. ' . $result['uploaded'] . ' were uploaded' );
 
@@ -170,7 +170,7 @@ class UploadClassTest extends TestCase
         // var_dump( $result );
         $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
 
-        $upload->removePackage( $folderId, $package );
+        $upload->removePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $package );
 
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $remaining = count( $gcs->listFolder( $folderId . '/' . $package ) );
