@@ -158,4 +158,23 @@ class UploadClassTest extends TestCase
         $remaining = count( $gcs->listFolder( $folderId . '/' . $old ) );
         $this->assertTrue( $remaining == 0, 'Replacement of ' . $old . ' failed. ' . $remaining . ' old files remaining.' );
     }
+
+    public function testRemove()
+    {
+        $upload = new UploadClass;
+
+        $zip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
+        $package = pathinfo( $zip, PATHINFO_FILENAME );
+        $folderId = 'test2';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $zip );
+        // var_dump( $result );
+        $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
+
+        $upload->removePackage( $folderId, $package );
+
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $package ) );
+
+        $this->assertTrue( $remaining == 0, 'Removal of ' . $package . ' failed. ' . $remaining . ' files remaining.' );
+    }
 }

@@ -156,16 +156,16 @@
         },
         {
             "name": "google/cloud-core",
-            "version": "v1.23.1",
+            "version": "v1.23.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GoogleCloudPlatform/google-cloud-php-core.git",
-                "reference": "44b3bb512a7a445bd4ecafbdc86ed7c142e58f9f"
+                "reference": "d1b5f59b78c696484c3005d632b64308cbb6f6d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-core/zipball/44b3bb512a7a445bd4ecafbdc86ed7c142e58f9f",
-                "reference": "44b3bb512a7a445bd4ecafbdc86ed7c142e58f9f",
+                "url": "https://api.github.com/repos/GoogleCloudPlatform/google-cloud-php-core/zipball/d1b5f59b78c696484c3005d632b64308cbb6f6d2",
+                "reference": "d1b5f59b78c696484c3005d632b64308cbb6f6d2",
                 "shasum": ""
             },
             "require": {
@@ -179,7 +179,7 @@
             },
             "require-dev": {
                 "erusev/parsedown": "^1.6",
-                "google/gax": "^0.36",
+                "google/gax": "^0.37",
                 "opis/closure": "^3",
                 "phpdocumentor/reflection": "^3.0",
                 "phpunit/phpunit": "^4.8|^5.0",
@@ -211,7 +211,7 @@
                 "Apache-2.0"
             ],
             "description": "Google Cloud PHP shared dependency, providing functionality useful to all components.",
-            "time": "2018-08-22T17:55:03+00:00"
+            "time": "2018-08-30T15:45:55+00:00"
         },
         {
             "name": "google/cloud-storage",

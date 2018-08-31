@@ -16,7 +16,7 @@ class AntivirusClass
      * @param string $file The fullpath of the file to check
      * @param object $socket The socket to use for client communication to clam av
      * 
-     * @return associative array $result {
+     * @return array $result {
      *  string ['filename']: the fullpath of the checked file,
      *  string ['reason']: Information on the virus found, NULL if no virus
      *  string ['status']: 'FOUND' if virus found, 'OK' otherwise

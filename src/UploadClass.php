@@ -19,10 +19,10 @@ class UploadClass implements ValidatorInterface
      * @param string $file The fullpath of the file to check
      * @param object $socket The socket to use for client communication to clam av
      * 
-     * @return associative array $result {
-     *  string ['filename']: the fullpath of the checked file,
-     *  string ['reason']: Information on the virus found, NULL if no virus
-     *  string ['status']: 'FOUND' if virus found, 'OK' otherwise
+     * @return array-of-object $result {</br>
+     *  string ['filename']: the fullpath of the checked file</br>,
+     *  string ['reason']: Information on the virus found, NULL if no virus</br>
+     *  string ['status']: 'FOUND' if virus found, 'OK' otherwise</br>
      * }
      */
     public function virusCheck( $file, $socket = null )
@@ -37,7 +37,7 @@ class UploadClass implements ValidatorInterface
      * @param array of strings $files Array of the fullpath of the files to check
      * @param object $socket The socket to use for client communication to clam av      
      * 
-     * @return array of associative array $result {
+     * @return array-of-array  $result {
      *  string ['filename']: the fullpath of the checked file,
      *  string ['reason']: Information on the virus found, NULL if no virus
      *  string ['status']: 'FOUND' if virus found, 'OK' otherwise
@@ -80,7 +80,7 @@ class UploadClass implements ValidatorInterface
      * @param string $folderId the GCS folder where to upload the file.
      * @param string $file the full path to the file to upload.
      * 
-     * @return associative array $result {
+     * @return array $result {
      *  string ['filename']: the fullpath of the checked file,
      *  object ['virusCheck']: the ruselt returned by the virusCheck function
      *  object ['validation']: the result returned by the validation function
@@ -126,7 +126,7 @@ class UploadClass implements ValidatorInterface
      * @param string $folderId the GCS folder where to upload the file.
      * @param string $file the full path to the file to upload.
      * 
-     * @return associative array $result {
+     * @return array $result {
      *  string ['folderId']: the GCS folder where the old package is,
      *  string ['old']: the name of the old package to replace,
      *  string ['new']: the local fullpath of the new package file,
@@ -166,8 +166,22 @@ class UploadClass implements ValidatorInterface
         $unzip = new UnzipClass;
         $unzip->removeZip( $unzippedPackage );
 
-        return $result;
-        
+        return $result;        
+    }
+
+
+    /**
+     * Delete a package from a specified folder
+     * 
+     * @param string $folderId The folder where the package is located
+     * @param string $packageName The name of the package to remove
+     * 
+     * @return integer The number of deleted files
+     */
+    public function removePackage( $folderId, $packageName )
+    {
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        return $gcs->removePackage( $folderId, $packageName );
     }
 
 }
