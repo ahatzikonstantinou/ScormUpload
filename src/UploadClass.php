@@ -53,6 +53,8 @@ class UploadClass implements ValidatorInterface
      * Validates a Scorm package
      * 
      * @param string $file
+     * @param boolean $removeOnValid If true the unzip folder will be removed if package is valid
+     * @param boolean $removeOnInvalid If true the unzip folder will be removed if package is invalid
      * 
      * @return array $result {
      * string ['error']: text descripton of the error, NULL if no error
@@ -76,7 +78,7 @@ class UploadClass implements ValidatorInterface
      * Unzips a zip file, and uploads the contents to Google Storage Cloud. In case of validation
      * error the unzipped folder is removed.
      * 
-     * @param string $bucketName the name of your Google Cloud bucket.
+     * @param string $bucketName the name of the Google Cloud bucket.
      * @param string $folderId the GCS folder where to upload the file.
      * @param string $file the full path to the file to upload.
      * 
@@ -122,7 +124,7 @@ class UploadClass implements ValidatorInterface
      * Replaces an existing package with a new one, provided the new package passes virus and validation checks.
      * In case of validation error the unzipped folder is removed.
      * 
-     * @param string $bucketName the name of your Google Cloud bucket.
+     * @param string $bucketName the name of the Google Cloud bucket.
      * @param string $folderId the GCS folder where to upload the file.
      * @param string $file the full path to the file to upload.
      * 
@@ -172,6 +174,7 @@ class UploadClass implements ValidatorInterface
     /**
      * Delete a package from a specified folder
      * 
+     * @param string $bucketName the name of the Google Cloud bucket.
      * @param string $folderId The folder where the package is located
      * @param string $packageName The name of the package to remove
      * 

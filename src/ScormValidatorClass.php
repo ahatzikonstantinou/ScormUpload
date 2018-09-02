@@ -16,6 +16,8 @@ class ScormValidatorClass implements ValidatorInterface
      * Validates a Scorm package
      * 
      * @param string $file
+     * @param boolean $removeOnValid If true the unzip folder will be removed if package is valid
+     * @param boolean $removeOnInvalid If true the unzip folder will be removed if package is invalid
      * 
      * @return array $result {
      * string ['destination']: the destination folder where the package file was extracted, NULL if it was removed
