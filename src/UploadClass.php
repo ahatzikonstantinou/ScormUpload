@@ -83,16 +83,17 @@ class UploadClass implements ValidatorInterface
      * 
      * @param string $bucketName the name of the Google Cloud bucket.
      * @param string $folderId the GCS folder where to upload the file.
-     * @param string $file the full path to the file to upload.
+     * @param string $scormId the scorm id (i.e. subfolder name) where to upload the package.
+     * @param string $file the full path to the package to upload.
      * 
      * @return array $result {
-     *  string ['filename']: the fullpath of the checked file,
+     *  string ['filename']: the fullpath of the checked package,
      *  object ['virusCheck']: the ruselt returned by the virusCheck function
      *  object ['validation']: the result returned by the validation function
      *  integer ['uploaded']: count of uploaded files
      *  boolean ['success']: true if everything went ok, false otherwise
     */
-    public function uploadZip( $bucketName, $folderId, $file )
+    public function uploadZip( $bucketName, $folderId, $scormId, $file )
     {
         $result = array( 'filename' => $file, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
 
@@ -112,7 +113,7 @@ class UploadClass implements ValidatorInterface
         $unzippedPackage = $result['validation']['destination'];
 
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
-        $result['uploaded'] = $gcs->uploadPackage( $folderId, $unzippedPackage );
+        $result['uploaded'] = $gcs->uploadPackage( $folderId, $scormId, $unzippedPackage );
         $result['success'] = true;
         // var_dump( $result );
 
@@ -133,16 +134,16 @@ class UploadClass implements ValidatorInterface
      * 
      * @return array $result {
      *  string ['folderId']: the GCS folder where the old package is,
-     *  string ['old']: the name of the old package to replace,
+     *  string ['scormId']: the id of the old package to replace,
      *  string ['new']: the local fullpath of the new package file,
-     *  object ['virusCheck']: the ruselt returned by the virusCheck function
+     *  object ['virusCheck']: the result returned by the virusCheck function
      *  object ['validation']: the result returned by the validation function
      *  integer ['uploaded']: count of uploaded files
      *  boolean ['success']: true if everything went ok, false otherwise
     */
-    public function replacePackage( $bucketName, $folderId, $oldPackage, $newPackage )
+    public function replacePackage( $bucketName, $folderId, $scormId, $newPackage )
     {
-        $result = array( 'folderId' => $folderId, 'old' => $oldPackage, 'new' => $newPackage, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
+        $result = array( 'folderId' => $folderId, 'scormId' => $scormId, 'new' => $newPackage, 'virusCheck' => null, 'validation' => null, 'uploaded' => 0, 'success' => false );
 
         $result['virusCheck'] = $this->virusCheck( $newPackage );
         // var_dump( $result['virusCheck'] );
@@ -157,12 +158,12 @@ class UploadClass implements ValidatorInterface
         }
 
         $gcs = new GCSClass( $bucketName );
-        $deleted = $gcs->removePackage( $folderId, $oldPackage );
+        $deleted = $gcs->removePackage( $folderId, $scormId );
 
         //NOTE: the unzip folder is returned in the validation result
         $unzippedPackage = $result['validation']['destination'];
 
-        $result['uploaded'] = $gcs->uploadPackage( $folderId, $unzippedPackage );
+        $result['uploaded'] = $gcs->uploadPackage( $folderId, $scormId, $unzippedPackage );
         $result['success'] = true;
         // var_dump( $result );
 
@@ -179,14 +180,14 @@ class UploadClass implements ValidatorInterface
      * 
      * @param string $bucketName the name of the Google Cloud bucket.
      * @param string $folderId The folder where the package is located
-     * @param string $packageName The name of the package to remove
+     * @param string $scormId The id of the package to remove
      * 
      * @return integer The number of deleted files
      */
-    public function removePackage( $bucketName, $folderId, $packageName )
+    public function removePackage( $bucketName, $folderId, $scormId )
     {
         $gcs = new GCSClass( $bucketName );
-        return $gcs->removePackage( $folderId, $packageName );
+        return $gcs->removePackage( $folderId, $scormId );
     }
 
 }

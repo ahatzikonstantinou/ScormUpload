@@ -126,7 +126,7 @@ class GCSClass
      * 
      * @return integer Number of objects uploaded
      */
-    public function uploadPackage( $folderId, $packageName )
+    public function uploadPackage( $folderId, $scormId, $packageName )
     {
         $storage = new StorageClient();
         
@@ -140,7 +140,7 @@ class GCSClass
             $count ++;
             $file = fopen( $name, 'r' );
             $name = substr( $name, strlen( $path ) );
-            $objectName = $folderId . DIRECTORY_SEPARATOR . basename( $packageName ) . $name;
+            $objectName = $folderId . DIRECTORY_SEPARATOR . $scormId . $name;
             // echo "$objectName\n";
             $object = $bucket->upload($file, [ 'name' => $objectName ]);            
         }
@@ -157,11 +157,11 @@ class GCSClass
      * 
      * @return integer Number of objects deleted
      */
-    public function removePackage( $folderId, $packageName )
+    public function removePackage( $folderId, $scormId )
     {
         $storage = new StorageClient();
         $bucket = $storage->bucket( $this->bucketName );
-        $options = ['prefix' => $folderId . '/' . $packageName ];
+        $options = ['prefix' => $folderId . '/' . $scormId ];
 
         $count = 0;
         foreach ( $bucket->objects( $options ) as $object ) {
@@ -174,14 +174,14 @@ class GCSClass
     }
 
 
-    public function replacePackage( $folderId, $old, $new )
+    public function replacePackage( $folderId, $scormId, $newPackage )
     {
         $storage = new StorageClient();
         $bucket = $storage->bucket( $this->bucketName );
-        $object = $bucket->object( $folderId . DIRECTORY_SEPARATOR . $old );
+        $object = $bucket->object( $folderId . DIRECTORY_SEPARATOR . $scormId );
         $object->delete();
 
-        $this->uploadPackage( $folderId, $new );
+        $this->uploadPackage( $folderId, $scormId, $newPackage );
     }
 
 }

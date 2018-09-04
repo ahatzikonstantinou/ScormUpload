@@ -18,29 +18,30 @@ class UploadClassTest extends TestCase
     {
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
 
-        $packagePath = './tests/testfiles/CodexData_test_LearnWorlds';
+        $packagePath = './tests/testfiles/CodexData_test_LearnWorlds_unzipped';
         $folderId = 'test1';
-        $uploaded = $gcs->uploadPackage( $folderId, $packagePath );
+        $scormId = 'id1';
+        $uploaded = $gcs->uploadPackage( $folderId, $scormId, $packagePath );
         $objects = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $packagePath, RecursiveDirectoryIterator::SKIP_DOTS ) );
         $count = 0;
         foreach($objects as $object){
             $count ++;
         }
         // echo "Uploaded $uploaded objects\n";
-        $this->assertTrue( $count == $uploaded, "Upload of package " . $packagePath . ' in GCS folder ' . $folderId . ' failed. Uploaded ' . $uploaded . ' of ' . $count . ' files.'  );
+        $this->assertTrue( $count == $uploaded, "Upload of package " . $packagePath . ' in GCS folder ' . $folderId . '/' . $scormId . ' failed. Uploaded ' . $uploaded . ' of ' . $count . ' files.'  );
     }
 
     public function testRemovePackage()
     {
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
-        $package = 'CodexData_test_LearnWorlds';
         $folderId = 'test1';
-        $deleted = $gcs->removePackage( $folderId, $package );
+        $scormId = 'id1';
+        $deleted = $gcs->removePackage( $folderId, $scormId );
         // echo "Deleted $deleted objects\n";
 
-        $remaining = count( $gcs->listFolder( $folderId . '/' . $package ) );
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $scormId ) );
 
-        $this->assertTrue( $remaining == 0, 'Removal of ' . $package . ' failed. ' . $remaining . ' files remaining.' );
+        $this->assertTrue( $remaining == 0, 'Removal of ' . $scormId . ' failed. ' . $remaining . ' files remaining.' );
     }
 
     /* The following tests are used for inspection only and do not contain any proper assertions

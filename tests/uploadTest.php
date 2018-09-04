@@ -119,14 +119,21 @@ class UploadClassTest extends TestCase
         $upload = new UploadClass;
 
         $zip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $zip );
+        $scormId = 'id3';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $scormId, $zip );
         // var_dump( $result );
         $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
+
+        // //clean up
+        // $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        // $gcs->removePackage( $folderId, $scormId );
+
         
         $zip = './tests/testfiles/IFRS-for-SMEs-e-learning-module.zip';
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $zip );
+        $scormId = 'id4';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $scormId, $zip );
         // var_dump( $result );
-        $this->assertFalse( $result['success'], $zip . ' upload failed because ' . $zip . ' is not a recognizablke package.'  );
+        $this->assertFalse( $result['success'], $zip . ' upload succeeded although ' . $zip . ' is not a recognizablke package!!!'  );
 
 
     }
@@ -134,29 +141,32 @@ class UploadClassTest extends TestCase
     public function testReplace()
     {   
         $folderId = 'test3';
-        $old = 'CodexData_test_LearnWorlds';
-        $oldZip = './tests/testfiles/' . $old . '.zip';
+        $scormId = 'id3';
+        $oldZip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
         $new = './tests/testfiles/Airport Known Supplier - Storyline output.zip';
 
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
 
         //ensure we start clean
-        $deleted = $gcs->removePackage( $folderId, $old );
-        $remaining = count( $gcs->listFolder( $folderId . '/' . $old ) );
-        $this->assertTrue( $remaining == 0, 'Removal of ' . $old . ' failed. ' . $remaining . ' files remaining.' );
+        $deleted = $gcs->removePackage( $folderId, $scormId );
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $scormId ) );
+        $this->assertTrue( $remaining == 0, 'Removal of ' . $scormId . ' failed. ' . $remaining . ' files remaining.' );
 
         //upload the old package
         $upload = new UploadClass;
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ),  $folderId, $oldZip );
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ),  $folderId, $scormId, $oldZip );
         $this->assertTrue( $result['success'], $oldZip . ' upload failed.'  );
         
         //replace with new
-        $result = $upload->replacePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $old, $new );
+        $result = $upload->replacePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $scormId, $new );
         // var_dump( $result );
         $this->assertTrue( $result['success'], 'Replacement with ' . $new . ' failed. ' . $result['uploaded'] . ' were uploaded' );
 
-        $remaining = count( $gcs->listFolder( $folderId . '/' . $old ) );
-        $this->assertTrue( $remaining == 0, 'Replacement of ' . $old . ' failed. ' . $remaining . ' old files remaining.' );
+        $current = count( $gcs->listFolder( $folderId . '/' . $scormId ) );
+        $this->assertTrue( $current == $result['uploaded'], 'Replacement of ' . $scormId . ' seems to have failed. ' . $current . ' files found instead of ' . $result['uploaded'] . ' uploaded.' );
+
+        //clean up
+        $gcs->removePackage( $folderId, $scormId );
     }
 
     public function testRemove()
@@ -166,14 +176,15 @@ class UploadClassTest extends TestCase
         $zip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
         $package = pathinfo( $zip, PATHINFO_FILENAME );
         $folderId = 'test2';
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $zip );
+        $scormId = 'id2';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $scormId, $zip );
         // var_dump( $result );
         $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
 
-        $upload->removePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $package );
+        $upload->removePackage( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $scormId );
 
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
-        $remaining = count( $gcs->listFolder( $folderId . '/' . $package ) );
+        $remaining = count( $gcs->listFolder( $folderId . '/' . $scormId ) );
 
         $this->assertTrue( $remaining == 0, 'Removal of ' . $package . ' failed. ' . $remaining . ' files remaining.' );
     }
