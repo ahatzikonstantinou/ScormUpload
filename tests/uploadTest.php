@@ -124,9 +124,9 @@ class UploadClassTest extends TestCase
         // var_dump( $result );
         $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
 
-        // //clean up
-        // $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
-        // $gcs->removePackage( $folderId, $scormId );
+        //clean up
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $gcs->removePackage( $folderId, $scormId );
 
         
         $zip = './tests/testfiles/IFRS-for-SMEs-e-learning-module.zip';
