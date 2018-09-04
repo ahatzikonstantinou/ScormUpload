@@ -57,6 +57,9 @@ class UploadClass implements ValidatorInterface
      * @param boolean $removeOnInvalid If true the unzip folder will be removed if package is invalid
      * 
      * @return array $result {
+     * string ['destination']: the destination folder where the package file was extracted, NULL if it was removed
+     * string ['version']: the version of the package as described by metadata schemaVersion
+     * string ['launcher']: the launcher file of the package
      * string ['error']: text descripton of the error, NULL if no error
      * boolean ['valid']: true if valid, false otherwise
      * }
@@ -69,7 +72,7 @@ class UploadClass implements ValidatorInterface
         }
         catch ( Exception $e )
         {
-            return array( 'error' => 'Could not get a validator for ' . $file . ': ' . $e->getMessage() , 'valid' => false );
+            return array( 'destination' => null, 'version' => null, 'launcher' => null, 'error' => 'Could not get a validator for ' . $file . ': ' . $e->getMessage() , 'valid' => false );
         }
         return $validator->validate( $file, $removeOnValid, $removeOnInvalid );
     }

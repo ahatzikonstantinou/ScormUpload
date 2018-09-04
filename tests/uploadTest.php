@@ -95,7 +95,7 @@ class UploadClassTest extends TestCase
         // var_dump( $result );
 
         $result = $this->validateFile( 'A-CMP300 Ver9.zip', true );
-        
+        // var_dump( $result );
     }
 
     private function validateFile( $zip, $assertTrue = false )

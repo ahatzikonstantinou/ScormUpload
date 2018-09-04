@@ -106,7 +106,7 @@ class ScormValidatorClass implements ValidatorInterface
             $destination = null;
         }
         
-        return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => $this->imsManifest->resources->resource->attributes()->href, 'error' => null, 'valid' => true );
+        return array( 'destination' => $destination, 'version' => trim( $this->imsManifest->metadata->schemaversion ), 'launcher' => (string) $this->imsManifest->resources->resource->attributes()->href, 'error' => null, 'valid' => true );
     }
 
 }
