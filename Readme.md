@@ -194,4 +194,4 @@ Command line utilites in folder `cli-utils` help executing methods such as packa
 * upload: uploads scorm packages in a specified folderId/scomrId.
 * lsp: lists packages in a specified folderD.
 
-**Note:** Edit the files in order to modify configuration settings.
+**Note:** Edit the files in order to modify configuration settings. The hasbang line `#! /usr/bin/php` may also need to be modified according to where the php binary is located in your system.
