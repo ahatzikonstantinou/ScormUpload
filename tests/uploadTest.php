@@ -96,6 +96,9 @@ class UploadClassTest extends TestCase
 
         $result = $this->validateFile( 'A-CMP300 Ver9.zip', true );
         // var_dump( $result );
+
+        $result = $this->validateFile( 'C01b_communication_v3.zip', true );
+        // var_dump( $result );
     }
 
     private function validateFile( $zip, $assertTrue = false )
@@ -118,9 +121,10 @@ class UploadClassTest extends TestCase
     {        
         $upload = new UploadClass;
 
+        $folderId = 'folderId1';
         $zip = './tests/testfiles/CodexData_test_LearnWorlds.zip';
-        $scormId = 'id3';
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $scormId, $zip );
+        $scormId = 'scormId1';
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $scormId, $zip );
         // var_dump( $result );
         $this->assertTrue( $result['success'], $zip . ' upload failed.'  );
 
@@ -131,11 +135,9 @@ class UploadClassTest extends TestCase
         
         $zip = './tests/testfiles/IFRS-for-SMEs-e-learning-module.zip';
         $scormId = 'id4';
-        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), 'test3', $scormId, $zip );
+        $result = $upload->uploadZip( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ), $folderId, $scormId, $zip );
         // var_dump( $result );
         $this->assertFalse( $result['success'], $zip . ' upload succeeded although ' . $zip . ' is not a recognizablke package!!!'  );
-
-
     }
 
     public function testReplace()

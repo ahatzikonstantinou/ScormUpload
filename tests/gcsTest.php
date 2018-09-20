@@ -2,12 +2,13 @@
 namespace ahat\ScormUpload\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Google\Cloud\Storage\StorageClient;
 use ahat\ScormUpload\GCSClass;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use RecursiveTreeIterator;
 
-class UploadClassTest extends TestCase
+class GCSClassTest extends TestCase
 {
     protected function setUp()
     {
@@ -44,7 +45,21 @@ class UploadClassTest extends TestCase
         $this->assertTrue( $remaining == 0, 'Removal of ' . $scormId . ' failed. ' . $remaining . ' files remaining.' );
     }
 
-    /* The following tests are used for inspection only and do not contain any proper assertions
+    public function testSignedUrl()
+    {
+        $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $folderId = 'test3';
+        $scormId = 'id3';
+        $file = 'index.html';
+        $signedURL = $gcs->signedUrl( $folderId, $scormId, $file );
+        echo "\n\n$signedURL\n\n";
+
+        $page = file_get_contents( $signedURL );
+        // echo "\n\n$page\n\n";
+        $this->assertTrue( strpos( $page, 'function initializeCP(' ) !== false, 'Signed url access for ' . $folderId . '/' . $scormId . '/'. $file . ' faield.' );
+    }
+
+    /* The following tests are used for inspection only and do not contain any proper assertions*/
 
     public function testListBucket()
     {
@@ -71,5 +86,19 @@ class UploadClassTest extends TestCase
         $gcs->listFolders();
         $this->assertTrue( true );
     }
-    */
+
+    public function testDownloadObject()
+    {
+        $folderId = 'test1';
+        $scormId = 'id1';
+        $file = 'index.html';
+        $storage = new StorageClient();
+        $bucket = $storage->bucket( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
+        $object = $bucket->object( $folderId . '/' . $scormId . '/'. $file );
+
+        $content = $object->downloadAsString();
+        echo "content:\n$content\n";
+        $this->assertNotEmpty( $content, "No content downloaded for " .$folderId . '/' . $scormId . '/'. $file . "\n" );
+    }
+    
 }

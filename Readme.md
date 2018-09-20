@@ -187,3 +187,11 @@ Uses class ZipArchive
 use mod_env to set
 
   * `SetEnv TMP_UNZIP_DIR "/path/to/temporary/folder/for/unzipping/"` (default /tmp/)  
+
+### Command Line Utils
+Command line utilites in folder `cli-utils` help executing methods such as package upload and package listing using the command line
+
+* upload: uploads scorm packages in a specified folderId/scomrId.
+* lsp: lists packages in a specified folderD.
+
+**Note:** Edit the files in order to modify configuration settings.

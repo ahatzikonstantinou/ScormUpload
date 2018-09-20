@@ -2,12 +2,13 @@
 
 namespace ahat\ScormUpload;
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Google\Cloud\Storage\StorageClient;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use RecursiveTreeIterator;
+use DateTime;
 
 class GCSClass
 {
@@ -182,6 +183,18 @@ class GCSClass
         $object->delete();
 
         $this->uploadPackage( $folderId, $scormId, $newPackage );
+    }
+
+    public function signedUrl( $folderId, $scormId, $file, $method = 'GET' )
+    {
+        $storage = new StorageClient();
+        $bucket = $storage->bucket( $this->bucketName );
+        $object = $bucket->object( $folderId . '/' . $scormId . '/'. $file );
+        if( is_null( $object ) ) {
+            return null;
+        }
+        $date = new DateTime( 'tomorrow' );
+        return $object->signedUrl( $date->getTimestamp(), ['method' => $method ] );
     }
 
 }
