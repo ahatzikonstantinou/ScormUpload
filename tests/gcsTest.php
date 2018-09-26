@@ -21,7 +21,7 @@ class GCSClassTest extends TestCase
 
         $packagePath = './tests/testfiles/CodexData_test_LearnWorlds_unzipped';
         $folderId = 'test1';
-        $scormId = 'id1';
+        $scormId = 'id3';
         $uploaded = $gcs->uploadPackage( $folderId, $scormId, $packagePath );
         $objects = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $packagePath, RecursiveDirectoryIterator::SKIP_DOTS ) );
         $count = 0;
@@ -36,7 +36,7 @@ class GCSClassTest extends TestCase
     {
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
         $folderId = 'test1';
-        $scormId = 'id1';
+        $scormId = 'id3';
         $deleted = $gcs->removePackage( $folderId, $scormId );
         // echo "Deleted $deleted objects\n";
 
@@ -48,8 +48,8 @@ class GCSClassTest extends TestCase
     public function testSignedUrl()
     {
         $gcs = new GCSClass( getenv( 'GOOGLE_CLOUD_STORAGE_BUCKET' ) );
-        $folderId = 'test3';
-        $scormId = 'id3';
+        $folderId = 'test1';
+        $scormId = 'id1';
         $file = 'index.html';
         $signedURL = $gcs->signedUrl( $folderId, $scormId, $file );
         echo "\n\n$signedURL\n\n";
